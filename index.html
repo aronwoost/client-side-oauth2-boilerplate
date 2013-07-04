@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <title></title>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+
+  <style type="text/css">
+  </style>
+
+</head>
+ 
+<body>
+  <a href="#" id="auth">Auth agains provider</a>
+
+  <script type="text/javascript">
+    var auth = JSON.parse(localStorage.getItem("app-namespace:auth"));
+
+    if(auth) {
+
+      $("#auth").hide();
+
+      $.ajaxSetup({
+        beforeSend: function(xhr, settings){
+          if(settings.url.indexOf("?") !== -1){
+            settings.url += "&oauth_token=" + auth.accessToken;
+          } else {
+            settings.url += "?oauth_token=" + auth.accessToken;
+          }
+        }
+      });
+
+      // make API call (catch error if token no loger valid)
+      $.ajax({
+        type: "GET",
+        url: "service-provider-endpoint",
+        dataType: "json",
+        success: function (data) {
+        },
+        error: function() {
+        }
+      });
+
+    } else {
+
+      $("#auth").click(function(evt){
+        evt.preventDefault();
+
+        // reqUrl might need additional parameter (scope?)
+        var clientId = "ABC123",
+          redirectUri = "http://yourdomain.com/auth.html",
+          reqUrl = "https://service-provider.com/redirect_uri="+redirectUri+"&response_type=token&client_id="+clientId;
+
+        window.location = reqUrl;
+      })
+
+    }
+
+  </script>
+</body>
+ 
+</html>
